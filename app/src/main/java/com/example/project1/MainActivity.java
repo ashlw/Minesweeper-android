@@ -1,8 +1,10 @@
 package com.example.project1;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.gridlayout.widget.GridLayout;
 
+import android.content.Intent;
 import android.content.res.Resources;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -19,6 +21,9 @@ public class MainActivity extends AppCompatActivity {
     private static final int ROW_COUNT = 10;
     private ArrayList<TextView> cell_tvs;
     private Random rand = new Random();
+    // flags
+    boolean lost = false;
+    boolean win = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,7 +40,8 @@ public class MainActivity extends AppCompatActivity {
                 TextView tv = (TextView) li.inflate(R.layout.custom_cell_layout, grid, false);
                 tv.setTag(0);
                 tv.setId(id);
-                tv.setTextColor(Color.GREEN);
+                tv.setText("");
+                tv.setTextColor(Color.GRAY);
                 tv.setBackgroundColor(Color.GREEN);
                 tv.setOnClickListener(this::onClickTV);
 
@@ -74,20 +80,22 @@ public class MainActivity extends AppCompatActivity {
                     increment(mine+10);
                     increment(mine+9);
                 }
+            }else{
+                if(mine > 9)
+                    increment(mine-10);
+                if(mine < 110)
+                    increment(mine+10);
             }
             //check for rightmost
             if( mine %10 != 9){
                 increment(mine+1);
-                // check if at top
-                if(mine > 9){
+                if(mine > 9)
                     increment(mine-9);
-                }
-                // check if at bottom
-                if(mine < 110){
+                if(mine < 110)
                     increment(mine+11);
-                }
             }
-        }
+        } //endFor
+
     }
 
     private int findIndexOfCellTextView(TextView tv) {
@@ -100,12 +108,31 @@ public class MainActivity extends AppCompatActivity {
 
     public void onClickTV(View view){
         TextView tv = (TextView) view;
-        int n = findIndexOfCellTextView(tv);
+        int tag = (int) tv.getTag();
+        // it's a mine
         if(tv.getText() == "M") {
             //BOOM YOU LOST
             tv.setTextColor(Color.GREEN);
+            lost = true;
+        }
+        // it has >0 adj mines
+        else if( tag > 0) {
+            tv.setText(Integer.toString(tag));
+            tv.setBackgroundColor(Color.LTGRAY);
+        }
+        // it has 0 adj mines, then keep clearing
+        else{
+            clear(tv.getId());
         }
 
+    }
+
+    public void onClickScreen(View v){
+        if( win || lost){
+            Intent intent = new Intent(this, Result.class);
+            startActivity(intent);
+        }
+        return;
     }
 
     public void increment(int id){
@@ -115,6 +142,32 @@ public class MainActivity extends AppCompatActivity {
             num++;
             tv.setTag(num);
         }
+    }
+
+    public void clear(int id){
+
+        if( id < 0 || id >=120)
+            return;
+        TextView tv = findViewById(id);
+        if(tv.getDrawingCacheBackgroundColor() == Color.LTGRAY)
+            return;
+        int tag = (int) tv.getTag();
+        tv.setBackgroundColor(Color.LTGRAY);
+
+        if(tag > 0) {
+            tv.setText(Integer.toString(tag));
+            tv.setTextColor(Color.GRAY);
+        }
+        else{
+            clear(id - 10);
+            //clear(id + 10);
+            if(id % 10 != 0)
+                clear(id -1);
+//            if(id % 10 != 9)
+//                clear(id+1);
+        }
+        return;
+
     }
 
 }

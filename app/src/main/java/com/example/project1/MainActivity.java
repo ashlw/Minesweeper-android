@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.content.res.Resources;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.TextView;
@@ -21,14 +22,23 @@ public class MainActivity extends AppCompatActivity {
     private static final int ROW_COUNT = 10;
     private ArrayList<TextView> cell_tvs;
     private Random rand = new Random();
+    private int clock = 0;
     // flags
     boolean lost = false;
     boolean win = false;
+    boolean running = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        if (savedInstanceState != null) {
+            clock = savedInstanceState.getInt("clock");
+            running = savedInstanceState.getBoolean("running");
+        }
+
+        runTimer();
 
         cell_tvs = new ArrayList<TextView>();
         GridLayout grid = (GridLayout) findViewById(R.id.gridLayout01);
@@ -41,7 +51,7 @@ public class MainActivity extends AppCompatActivity {
                 tv.setTag(0);
                 tv.setId(id);
                 tv.setText("");
-                tv.setTextColor(Color.GRAY);
+                tv.setTextColor(Color.GREEN);
                 tv.setBackgroundColor(Color.GREEN);
                 tv.setOnClickListener(this::onClickTV);
 
@@ -65,7 +75,6 @@ public class MainActivity extends AppCompatActivity {
                 tv = (TextView) findViewById(mine);
             }
             tv.setText("M");
-            tv.setTextColor(Color.GRAY);
 
             // check for leftmost
             if( mine%10 != 0){
@@ -98,26 +107,21 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    private int findIndexOfCellTextView(TextView tv) {
-        for (int n=0; n<cell_tvs.size(); n++) {
-            if (cell_tvs.get(n) == tv)
-                return n;
-        }
-        return -1;
-    }
-
     public void onClickTV(View view){
         TextView tv = (TextView) view;
         int tag = (int) tv.getTag();
         // it's a mine
+        String bomb = getString(R.string.mine);
         if(tv.getText() == "M") {
             //BOOM YOU LOST
-            tv.setTextColor(Color.GREEN);
+            tv.setText(bomb);
             lost = true;
+            running = false;
         }
         // it has >0 adj mines
         else if( tag > 0) {
             tv.setText(Integer.toString(tag));
+            tv.setTextColor(Color.GRAY);
             tv.setBackgroundColor(Color.LTGRAY);
         }
         // it has 0 adj mines, then keep clearing
@@ -130,6 +134,7 @@ public class MainActivity extends AppCompatActivity {
     public void onClickScreen(View v){
         if( win || lost){
             Intent intent = new Intent(this, Result.class);
+            intent.putExtra("com.example.project1.CLOCK", Integer.toString(clock));
             startActivity(intent);
         }
         return;
@@ -168,6 +173,24 @@ public class MainActivity extends AppCompatActivity {
         }
         return;
 
+    }
+
+    private void runTimer() {
+        final TextView timeView = (TextView) findViewById(R.id.timer);
+        final Handler handler = new Handler();
+
+        handler.post(new Runnable() {
+            @Override
+            public void run() {
+                String time = String.format("%d", clock);
+                timeView.setText(time);
+
+                if (running) {
+                    clock++;
+                }
+                handler.postDelayed(this, 1000);
+            }
+        });
     }
 
 }

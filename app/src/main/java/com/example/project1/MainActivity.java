@@ -23,10 +23,12 @@ public class MainActivity extends AppCompatActivity {
     private ArrayList<TextView> cell_tvs;
     private Random rand = new Random();
     private int clock = 0;
+    private int flag_count = 0;
     // flags
     boolean lost = false;
     boolean win = false;
     boolean running = true;
+    boolean dig = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -110,25 +112,32 @@ public class MainActivity extends AppCompatActivity {
     public void onClickTV(View view){
         TextView tv = (TextView) view;
         int tag = (int) tv.getTag();
-        // it's a mine
-        String bomb = getString(R.string.mine);
-        if(tv.getText() == "M") {
-            //BOOM YOU LOST
-            tv.setText(bomb);
-            lost = true;
-            running = false;
+        //dig mode
+        if(dig) {
+            if (tv.getText() == "M") {
+                //BOOM YOU LOST
+                String bomb = getString(R.string.mine);
+                tv.setText(bomb);
+                lost = true;
+                running = false;
+            }
+            //has a number
+            else if (tag > 0) {
+                tv.setText(Integer.toString(tag));
+                tv.setTextColor(Color.GRAY);
+                tv.setBackgroundColor(Color.LTGRAY);
+            }
+            // it has 0 adj mines, then keep clearing
+            else {
+                clear(tv.getId());
+            }
         }
-        // it has >0 adj mines
-        else if( tag > 0) {
-            tv.setText(Integer.toString(tag));
-            tv.setTextColor(Color.GRAY);
-            tv.setBackgroundColor(Color.LTGRAY);
-        }
-        // it has 0 adj mines, then keep clearing
         else{
-            clear(tv.getId());
+            tv.setText(R.string.flag);
+            flag_count++;
+            TextView count = (TextView) findViewById(R.id.flagcount);
+            count.setText(Integer.toString(flag_count));
         }
-
     }
 
     public void onClickScreen(View v){
@@ -138,6 +147,15 @@ public class MainActivity extends AppCompatActivity {
             startActivity(intent);
         }
         return;
+    }
+
+    public void switchMode(View v){
+        TextView tv = (TextView) v;
+        dig = !dig;
+        if(dig)
+            tv.setText(R.string.pick);
+        else
+            tv.setText(R.string.flag);
     }
 
     public void increment(int id){

@@ -14,11 +14,22 @@
         android:layout_height="wrap_content"
         android:text="@string/flag"
         android:textSize="32sp"
-        android:layout_marginEnd="200dp"
+        android:layout_marginEnd="300dp"
         app:layout_constraintBottom_toTopOf="@id/gridLayout01"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/flagcount"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="0"
+        android:textSize="32sp"
+        app:layout_constraintEnd_toStartOf="@id/clock"
+        app:layout_constraintStart_toEndOf="@id/flag"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/gridLayout01"/>
 
     <TextView
         android:layout_width="wrap_content"
@@ -47,18 +58,29 @@
     <androidx.gridlayout.widget.GridLayout
         android:id="@+id/gridLayout01"
         android:layout_width="360dp"
-        android:layout_height="500dp"
+        android:layout_height="430dp"
         android:layout_marginStart="32dp"
-        android:layout_marginTop="80dp"
+        android:layout_marginTop="50dp"
         android:layout_marginEnd="32dp"
         app:rowCount="12"
         app:columnCount="10"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        >
+        app:layout_constraintTop_toTopOf="parent">
 
     </androidx.gridlayout.widget.GridLayout>
+
+    <TextView
+        android:id="@+id/mode"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/pick"
+        android:textSize="32sp"
+        android:onClick="switchMode"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/gridLayout01"
+        app:layout_constraintBottom_toBottomOf="parent"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

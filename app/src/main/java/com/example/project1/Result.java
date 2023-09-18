@@ -17,8 +17,14 @@ public class Result extends AppCompatActivity {
 
         Intent intent = getIntent();
         String clock = intent.getStringExtra("com.example.project1.CLOCK");
-        TextView tv = (TextView) findViewById(R.id.resultText);
-        tv.setText("Used " + clock + " seconds.");
+        Boolean win = intent.getExtras().getBoolean("win");
+        String res;
+        if(win)
+            res = "You won.";
+        else
+            res = "You lost.";
+        TextView tv = (TextView) findViewById(R.id.seconds);
+        tv.setText("Used " + clock + " seconds.\n" + res + "\nGood job!");
 
     }
 

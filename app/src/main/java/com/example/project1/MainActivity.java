@@ -18,12 +18,11 @@ import java.util.Random;
 
 public class MainActivity extends AppCompatActivity {
 
-    private static final int COLUMN_COUNT = 10;
-    private static final int ROW_COUNT = 10;
     private ArrayList<TextView> cell_tvs;
     private Random rand = new Random();
     private int clock = 0;
     private int flag_count = 0;
+    private int[] mines = new int[4];
     // flags
     boolean lost = false;
     boolean win = false;
@@ -77,7 +76,7 @@ public class MainActivity extends AppCompatActivity {
                 tv = (TextView) findViewById(mine);
             }
             tv.setText("M");
-
+            mines[i] = mine;
             // check for leftmost
             if( mine%10 != 0){
                 increment(mine-1);
@@ -114,12 +113,13 @@ public class MainActivity extends AppCompatActivity {
         int tag = (int) tv.getTag();
         //dig mode
         if(dig) {
-            if (tv.getText() == "M") {
-                //BOOM YOU LOST
+            if(tv.getText() == getString(R.string.mine)){}
+            else if (tv.getText() == "M") {
                 String bomb = getString(R.string.mine);
                 tv.setText(bomb);
                 lost = true;
                 running = false;
+                revealMines();
             }
             //has a number
             else if (tag > 0) {
@@ -132,9 +132,15 @@ public class MainActivity extends AppCompatActivity {
                 clear(tv.getId());
             }
         }
-        else{
-            tv.setText(R.string.flag);
-            flag_count++;
+        else{ // flag mode
+            if(tv.getText() == getString(R.string.flag)){
+                tv.setText("");
+                flag_count--;
+            }
+            else {
+                tv.setText(R.string.flag);
+                flag_count++;
+            }
             TextView count = (TextView) findViewById(R.id.flagcount);
             count.setText(Integer.toString(flag_count));
         }
@@ -144,6 +150,7 @@ public class MainActivity extends AppCompatActivity {
         if( win || lost){
             Intent intent = new Intent(this, Result.class);
             intent.putExtra("com.example.project1.CLOCK", Integer.toString(clock));
+            intent.putExtra("win", win);
             startActivity(intent);
         }
         return;
@@ -209,6 +216,13 @@ public class MainActivity extends AppCompatActivity {
                 handler.postDelayed(this, 1000);
             }
         });
+    }
+
+    private void revealMines(){
+        for(int i = 0; i<4; i++){
+            TextView tv = (TextView) findViewById(mines[i]);
+            tv.setText(R.string.mine);
+        }
     }
 
 }

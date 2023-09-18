@@ -23,6 +23,7 @@ public class MainActivity extends AppCompatActivity {
     private int clock = 0;
     private int flag_count = 0;
     private int[] mines = new int[4];
+    private int cells_revealed = 0;
     // flags
     boolean lost = false;
     boolean win = false;
@@ -111,8 +112,12 @@ public class MainActivity extends AppCompatActivity {
     public void onClickTV(View view){
         TextView tv = (TextView) view;
         int tag = (int) tv.getTag();
+        if(win || lost){
+            endGame();
+        }
         //dig mode
         if(dig) {
+
             if(tv.getText() == getString(R.string.mine)){}
             else if (tv.getText() == "M") {
                 String bomb = getString(R.string.mine);
@@ -147,13 +152,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void onClickScreen(View v){
-        if( win || lost){
-            Intent intent = new Intent(this, Result.class);
-            intent.putExtra("com.example.project1.CLOCK", Integer.toString(clock));
-            intent.putExtra("win", win);
-            startActivity(intent);
-        }
-        return;
+        endGame();
     }
 
     public void switchMode(View v){
@@ -176,25 +175,35 @@ public class MainActivity extends AppCompatActivity {
 
     public void clear(int id){
 
+        //out of bounds
         if( id < 0 || id >=120)
             return;
         TextView tv = findViewById(id);
-        if(tv.getDrawingCacheBackgroundColor() == Color.LTGRAY)
-            return;
         int tag = (int) tv.getTag();
+        //visited
+        if(tag == -1)
+            return;
         tv.setBackgroundColor(Color.LTGRAY);
+        //mark as visited and increment counter
+        tv.setTag(-1);
+        cells_revealed++;
+        if(cells_revealed == 116){
+            win = true;
+            return;
+        }
 
         if(tag > 0) {
             tv.setText(Integer.toString(tag));
             tv.setTextColor(Color.GRAY);
+            tv.setTag(-1);
         }
         else{
             clear(id - 10);
-            //clear(id + 10);
+            clear(id + 10);
             if(id % 10 != 0)
                 clear(id -1);
-//            if(id % 10 != 9)
-//                clear(id+1);
+            if(id % 10 != 9)
+                clear(id+1);
         }
         return;
 
@@ -223,6 +232,16 @@ public class MainActivity extends AppCompatActivity {
             TextView tv = (TextView) findViewById(mines[i]);
             tv.setText(R.string.mine);
         }
+    }
+
+    private void endGame(){
+        if( win || lost){
+            Intent intent = new Intent(this, Result.class);
+            intent.putExtra("com.example.project1.CLOCK", Integer.toString(clock));
+            intent.putExtra("win", win);
+            startActivity(intent);
+        }
+        return;
     }
 
 }

@@ -77,6 +77,7 @@ public class MainActivity extends AppCompatActivity {
                 tv = (TextView) findViewById(mine);
             }
             tv.setText("M");
+            tv.setTag(-2);
             mines[i] = mine;
             // check for leftmost
             if( mine%10 != 0){
@@ -119,8 +120,9 @@ public class MainActivity extends AppCompatActivity {
         //dig mode
         if(dig) {
 
-            if(tv.getText() == getString(R.string.mine)){}
-            else if (tv.getText() == "M") {
+            if(tv.getText() == getString(R.string.mine) ||
+            tv.getText() == getString(R.string.flag)){}
+            else if ((int)tv.getTag() == -2) {
                 String bomb = getString(R.string.mine);
                 tv.setText(bomb);
                 lost = true;
@@ -193,7 +195,10 @@ public class MainActivity extends AppCompatActivity {
         //mark as visited and increment counter
         tv.setTag(-1);
         cells_revealed++;
-        System.out.println(cells_revealed);
+        if(cells_revealed == 116){
+            running = false;
+            win = true;
+        }
         if(tag > 0) {
             tv.setText(Integer.toString(tag));
             tv.setTextColor(Color.GRAY);

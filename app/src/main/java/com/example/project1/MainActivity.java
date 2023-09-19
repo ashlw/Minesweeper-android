@@ -112,6 +112,7 @@ public class MainActivity extends AppCompatActivity {
     public void onClickTV(View view){
         TextView tv = (TextView) view;
         int tag = (int) tv.getTag();
+
         if(win || lost){
             endGame();
         }
@@ -131,8 +132,13 @@ public class MainActivity extends AppCompatActivity {
                 tv.setText(Integer.toString(tag));
                 tv.setTextColor(Color.GRAY);
                 tv.setBackgroundColor(Color.LTGRAY);
+                cells_revealed++;
+                if(cells_revealed == 116){
+                    running = false;
+                    win = true;
+                    revealMines();
+                }
             }
-            // it has 0 adj mines, then keep clearing
             else {
                 clear(tv.getId());
             }
@@ -187,11 +193,7 @@ public class MainActivity extends AppCompatActivity {
         //mark as visited and increment counter
         tv.setTag(-1);
         cells_revealed++;
-        if(cells_revealed == 116){
-            win = true;
-            return;
-        }
-
+        System.out.println(cells_revealed);
         if(tag > 0) {
             tv.setText(Integer.toString(tag));
             tv.setTextColor(Color.GRAY);
